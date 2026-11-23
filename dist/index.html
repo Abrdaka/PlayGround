@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#11100d" />
+  <title>7 DAYS TO DIE — Voxel Survival</title>
+  <script type="module" crossorigin src="./assets/index-D6fyNzvy.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-Cjfwsjtx.css">
+</head>
+<body>
+  <div id="app">
+    <div id="game"></div>
+    <div id="ui-layer" class="ui-layer"></div>
+
+    <div id="loading">
+      <div class="load-mark">7</div>
+      <div class="load-text">GENERATING THE WASTELAND</div>
+      <div class="load-bar"><i></i></div>
+    </div>
+
+    <!-- ============ MAIN MENU ============ -->
+    <section id="menu" class="overlay menu hidden">
+      <div class="menu-grade"></div>
+      <div class="menu-top">
+        <span class="tag">SURVIVAL / VOXEL / HORDE</span>
+        <span class="menu-version">BUILD 1.7.7</span>
+      </div>
+      <div class="menu-inner">
+        <div class="menu-block">
+          <div class="eyebrow"><span class="line"></span> Navezgane is gone. You are not.</div>
+          <h1 class="logo">
+            <span class="num">7</span>
+            <span class="stack"><b>DAYS</b><em>TO DIE</em></span>
+          </h1>
+          <p class="tagline">Mine the earth. Build a fortress.<br>When the seventh night falls, <strong>they will come.</strong></p>
+          <div class="menu-actions">
+            <button id="btn-start" class="btn btn-primary">Start</button>
+            <button id="btn-continue" class="btn btn-ghost hidden">Continue</button>
+          </div>
+          <div class="menu-meta">
+            <div><span>WORLD</span><b>Random 160 × 160</b></div>
+            <div><span>SEED</span><b>#20250707</b></div>
+            <div><span>DIFFICULTY</span><b>NOMAD</b></div>
+          </div>
+        </div>
+        <div class="menu-side">
+          <div class="side-card">
+            <h3>FIELD NOTES</h3>
+            <ul>
+              <li><kbd>WASD</kbd> move <kbd>SHIFT</kbd> sprint</li>
+              <li><kbd>LMB</kbd> mine / attack <kbd>RMB</kbd> build</li>
+              <li><kbd>1</kbd>–<kbd>7</kbd> gear <kbd>B</kbd> block type</li>
+              <li><kbd>E</kbd> pack &amp; crafting <kbd>F</kbd> drink water</li>
+              <li><kbd>ESC</kbd> pause <kbd>M</kbd> mute</li>
+            </ul>
+          </div>
+          <div class="side-quote">“The first night is quiet.<br>The seventh is not.”</div>
+        </div>
+      </div>
+      <div class="menu-bottom">
+        <span>Day cycle ≈ 3 minutes · Blood moon every 7th night</span>
+        <span class="warn">⚠ Contains voxel gore</span>
+      </div>
+    </section>
+
+    <!-- ============ HUD ============ -->
+    <div id="hud" class="hud hidden">
+      <div class="vignette"></div>
+      <div id="damage-flash" class="damage-flash"></div>
+      <div id="low-health" class="low-health"></div>
+
+      <div class="hud-top-left">
+        <div class="brand-mini"><span>7</span> DAYS TO DIE</div>
+        <div class="vitals">
+          <div class="vital health">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.7-9.5-9.2C.7 7.7 3.2 4 6.8 4c2 0 3.7 1.1 5.2 3 1.5-1.9 3.2-3 5.2-3 3.6 0 6.1 3.7 4.3 7.8C19.5 16.3 12 21 12 21z"/></svg>
+            <div class="vital-body"><div class="vital-row"><span>HEALTH</span><b id="v-health">100</b></div><div class="track"><i id="bar-health" style="width:100%"></i></div></div>
+          </div>
+          <div class="vital stamina">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
+            <div class="vital-body"><div class="vital-row"><span>STAMINA</span><b id="v-stamina">100</b></div><div class="track"><i id="bar-stamina" style="width:100%"></i></div></div>
+          </div>
+          <div class="vital hunger">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v9a3 3 0 0 0 6 0V2h-2v7H9V2H7v7H6zm12 0c-2 0-3 2-3 5s1 4 2 4v11h2V2z"/></svg>
+            <div class="vital-body"><div class="vital-row"><span>HUNGER</span><b id="v-hunger">100</b></div><div class="track"><i id="bar-hunger" style="width:100%"></i></div></div>
+          </div>
+          <div class="vital thirst">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2s7 8.3 7 13a7 7 0 0 1-14 0C5 10.3 12 2 12 2z"/></svg>
+            <div class="vital-body"><div class="vital-row"><span>THIRST</span><b id="v-thirst">100</b></div><div class="track"><i id="bar-thirst" style="width:100%"></i></div></div>
+          </div>
+        </div>
+        <div class="xp-row"><span id="v-level">LVL 1</span><div class="xp-track"><i id="bar-xp"></i></div><span id="v-xp">0/100</span></div>
+      </div>
+
+      <div class="hud-top-center">
+        <div class="clock-card" id="clock-card">
+          <div class="clock-icon" id="clock-icon">☀</div>
+          <div class="clock-main">
+            <div class="clock-day"><b id="v-day">DAY 1</b><span id="v-phase">MORNING</span></div>
+            <div class="clock-time" id="v-time">08:10</div>
+          </div>
+          <div class="clock-sub"><span id="v-horde">BLOOD MOON IN 6 NIGHTS</span><div class="pips" id="day-pips"></div></div>
+        </div>
+        <div id="horde-banner" class="horde-banner hidden">
+          <div class="hb-line"></div>
+          <div class="hb-text"><small>THE SEVENTH NIGHT</small>THE HORDE IS COMING</div>
+          <div class="hb-line"></div>
+        </div>
+      </div>
+
+      <div class="hud-top-right">
+        <div class="mission-card">
+          <div class="mission-head"><span>OBJECTIVE</span><b id="obj-day">DAY 1 / 7</b></div>
+          <div class="mission-title" id="obj-title">SURVIVE THE FIRST NIGHT</div>
+          <div class="mission-desc" id="obj-desc">Scavenge, build shelter, and live until dawn.</div>
+          <div class="mission-pips" id="mission-pips"></div>
+        </div>
+        <div class="compass"><span id="v-compass">N</span><i></i></div>
+      </div>
+
+      <div class="crosshair" id="crosshair">
+        <div class="ch-dot"></div>
+        <div class="ch-tick t"></div><div class="ch-tick b"></div><div class="ch-tick l"></div><div class="ch-tick r"></div>
+        <div class="mine-ring" id="mine-ring"></div>
+        <div class="hitmarker" id="hitmarker">✕</div>
+        <div class="target-label" id="target-label"></div>
+      </div>
+
+      <div class="notifications" id="notifications"></div>
+      <div class="hint-strip" id="hint-strip">Hold <kbd>LMB</kbd> to chop · <kbd>RMB</kbd> to build · <kbd>E</kbd> for pack</div>
+
+      <div class="hud-bottom">
+        <div class="status-pill" id="status-pill"></div>
+        <div class="hotbar" id="hotbar"></div>
+      </div>
+      <div class="hand-info">
+        <div class="ammo" id="ammo-box"><span class="ammo-num" id="v-ammo">18</span><span class="ammo-label">9MM</span></div>
+        <div class="block-sel" id="block-sel"></div>
+      </div>
+
+      <div class="mobile-controls hidden" id="mobile-controls">
+        <div class="stick-zone" id="stick-zone"><div class="stick-base"><div class="stick-knob" id="stick-knob"></div></div></div>
+        <div class="mob-buttons">
+          <button class="mob-btn jump" id="mob-jump" aria-label="Jump">▲</button>
+          <button class="mob-btn place" id="mob-place" aria-label="Place block">▦</button>
+          <button class="mob-btn mine" id="mob-mine" aria-label="Mine">⛏</button>
+        </div>
+        <div class="mob-top">
+          <button class="mob-small" id="mob-pack" aria-label="Pack">PACK</button>
+          <button class="mob-small" id="mob-pause" aria-label="Pause">II</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ INVENTORY ============ -->
+    <section id="inventory" class="overlay panel-overlay hidden">
+      <div class="panel wide">
+        <header class="panel-head">
+          <div><span class="tag">SURVIVOR</span><h2>PACK &amp; CRAFTING</h2></div>
+          <button class="icon-btn" id="btn-close-inv" aria-label="Close">✕</button>
+        </header>
+        <div class="panel-body">
+          <div class="inv-col">
+            <h3>SUPPLIES</h3>
+            <div class="inv-grid" id="inv-grid"></div>
+            <div class="inv-tools">
+              <div class="quest-note"><b>FIELD TIP</b><p id="tip-text">Zombies smash walls. Two layers of cobblestone buys you time — and a firing line.</p></div>
+            </div>
+          </div>
+          <div class="craft-col">
+            <h3>WORKBENCH</h3>
+            <div class="recipes" id="recipes"></div>
+          </div>
+        </div>
+        <footer class="panel-foot"><span><kbd>E</kbd> or <kbd>ESC</kbd> to close</span><span class="panel-note">Crafting is instant. Time is not on your side.</span></footer>
+      </div>
+    </section>
+
+    <!-- ============ DEATH ============ -->
+    <section id="death" class="overlay end-screen hidden">
+      <div class="end-inner">
+        <div class="end-kicker">THE WASTELAND CLAIMS ANOTHER</div>
+        <h2 class="end-title">YOU DIED</h2>
+        <div class="end-stats" id="death-stats"></div>
+        <div class="end-actions">
+          <button id="btn-respawn" class="btn btn-primary">Respawn</button>
+          <button id="btn-death-menu" class="btn btn-ghost">Main Menu</button>
+        </div>
+        <p class="end-quote">“Build higher. Build thicker. Build faster.”</p>
+      </div>
+    </section>
+
+    <!-- ============ VICTORY ============ -->
+    <section id="victory" class="overlay end-screen victory hidden">
+      <div class="end-inner">
+        <div class="end-kicker">DAWN BREAKS. THE HORDE IS ASH.</div>
+        <h2 class="end-title">YOU SURVIVED<br><span>7 DAYS</span></h2>
+        <div class="end-stats" id="victory-stats"></div>
+        <div class="end-actions">
+          <button id="btn-continue-game" class="btn btn-primary">Keep Surviving</button>
+          <button id="btn-victory-menu" class="btn btn-ghost">Main Menu</button>
+        </div>
+        <p class="end-quote">Day 8 is a gift. Spend it well.</p>
+      </div>
+    </section>
+
+    <!-- ============ PAUSE ============ -->
+    <section id="pause" class="overlay pause hidden">
+      <div class="pause-inner">
+        <span class="tag">SURVIVAL SUSPENDED</span>
+        <h2>PAUSED</h2>
+        <div class="pause-actions">
+          <button id="btn-resume" class="btn btn-primary">Resume</button>
+          <button id="btn-save" class="btn btn-ghost">Save Game</button>
+          <button id="btn-pause-menu" class="btn btn-ghost">Main Menu</button>
+        </div>
+        <div class="pause-hint">Press <kbd>ESC</kbd> to resume · <kbd>M</kbd> mute</div>
+      </div>
+    </section>
+
+    <div id="toast-big" class="toast-big hidden"></div>
+    <div id="crosshair-msg" class="crosshair-msg hidden"></div>
+  </div>
+</body>
+</html>
