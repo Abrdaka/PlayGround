@@ -28,7 +28,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.02;
+renderer.toneMappingExposure = 1.1;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(42, 1, .1, 260);
@@ -63,13 +63,18 @@ for (const k of ['shiv', 'bat', 'pistol']) {
   weaponModels[k] = m;
 }
 
-const flash = new THREE.SpotLight(0xffe8c0, 0, 32, .5, .6, 1.35);
+const flash = new THREE.SpotLight(0xffe8c0, 0, 26, .44, .55, 1.15);
 flash.castShadow = true;
 flash.shadow.mapSize.set(512, 512);
 flash.shadow.bias = -.0015;
 flash.shadow.camera.near = .4;
 flash.shadow.camera.far = 32;
 scene.add(flash, flash.target);
+
+// A soft overhead pool keeps the survivor readable in the dark without
+// washing out the night. It reads as sky/bounce light, not a lamp.
+const playerLight = new THREE.PointLight(0xcfdac2, 0, 6.2, 2);
+scene.add(playerLight);
 
 const aimRing = new THREE.Mesh(
   new THREE.RingGeometry(.8, .9, 30),
@@ -242,12 +247,14 @@ function updateHud() {
   ui.perimeter.textContent = breached ? 'BREACHED' : secure ? 'SECURE' : partial ? 'PARTIAL' : 'UNSECURED';
   ui.perimeter.style.color = breached ? '#e26951' : secure ? '#d6e675' : partial ? '#e2b566' : '#9aa493';
   document.body.classList.toggle('hurt', player.hp < 35 && player.hp > 0);
-  ui.threat.classList.toggle('on', state.night && state.playing);
-  if (state.night) ui.threat.innerHTML = breached ? '<i></i>THEY ARE INSIDE THE HOUSE' : '<i></i>THE DEAD ARE DRAWN TO NOISE';
+  ui.threat.classList.toggle('on', (state.night || breached) && state.playing);
+  if (state.night || breached) ui.threat.innerHTML = breached ? '<i></i>THEY ARE INSIDE THE HOUSE' : '<i></i>THE DEAD ARE DRAWN TO NOISE';
   // objective copy
   if (state.playing) {
-    if (state.night) {
-      ui.goal.textContent = breached ? 'They are inside. Fight or flee.' : 'Hold the safehouse until dawn.';
+    if (breached) {
+      ui.goal.textContent = 'They are inside. Fight or flee.';
+    } else if (state.night) {
+      ui.goal.textContent = 'Hold the safehouse until dawn.';
     } else if (secure) {
       ui.goal.textContent = 'Perimeter secure. Hold until nightfall.';
     } else if (partial) {
@@ -915,6 +922,8 @@ function updatePlayer(dt) {
 
   const wx = worldX(player.gx), wz = worldZ(player.gy);
   survivor.root.position.set(wx, 0, wz);
+  playerLight.position.set(wx, 3.4, wz);
+  playerLight.intensity = state.nightFactor * 4.2;
   animateSurvivor(survivor, {
     time: clock.elapsedTime, speed: player.speed * CELL, aiming: player.aim,
     attackT: player.attackT, torchOn: state.nightFactor > .05,
@@ -924,7 +933,7 @@ function updatePlayer(dt) {
   aimRing.position.set(aimPoint.x, .03, aimPoint.z);
   aimRing.visible = state.playing && !state.modal;
   if (state.nightFactor > .02) {
-    flash.intensity = state.nightFactor * 4.3 + (state.shotPulse || 0) * 42;
+    flash.intensity = state.nightFactor * 26 + (state.shotPulse || 0) * 60;
     flash.position.set(wx + ax * .35, 1.5, wz + az * .35);
     flash.target.position.set(wx + ax * 8.5, 0, wz + az * 8.5);
     flash.target.updateMatrixWorld();
@@ -1214,10 +1223,11 @@ requestAnimationFrame(frame);
 
 // Small debug surface used by the automated play-test harness.
 window.__lastlight = {
-  state, player, resources, world,
+  state, player, resources, world, renderer, scene, camera,
   get zombies() { return zombies; },
   get weapon() { return weapon; },
   findNear, interact, attack, boardUp, useCar, startFresh, endGame, setWeapon,
+  spawnZombie, saveGame, craft, hurt, updateHud,
   get save() { return loadSave(); },
 };
 

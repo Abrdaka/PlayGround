@@ -174,7 +174,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.02;
+renderer.toneMappingExposure = 1.1;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(42, 1, .1, 260);
@@ -196,11 +196,11 @@ const audio = createAudio();
   scene.background = bg;
   scene.fog = new THREE.FogExp2(0x43503f, .012);
 
-  const hemi = new THREE.HemisphereLight(0xa9b7ae, 0x2b2f24, .9);
+  const hemi = new THREE.HemisphereLight(0xa9b7ae, 0x2b2f24, 1.0);
   scene.add(hemi);
-  const ambient = new THREE.AmbientLight(0x4d5b58, .28);
+  const ambient = new THREE.AmbientLight(0x4d5b58, .36);
   scene.add(ambient);
-  const sun = new THREE.DirectionalLight(0xffd6a2, 2.5);
+  const sun = new THREE.DirectionalLight(0xffd6a2, 2.85);
   sun.position.set(-34, 38, 24);
   sun.target.position.set(0, 0, 0);
   sun.castShadow = true;
@@ -487,6 +487,8 @@ function updatePlayer(dt) {
 
   const wx = worldX(player.gx), wz = worldZ(player.gy);
   survivor.root.position.set(wx, 0, wz);
+  playerLight.position.set(wx, 3.1, wz);
+  playerLight.intensity = state.nightFactor * 2.4;
   animateSurvivor(survivor, {
     time: clock.elapsedTime, speed: player.speed * CELL, aiming: player.aim,
     attackT: player.attackT, torchOn: state.nightFactor > .05,
@@ -496,7 +498,7 @@ function updatePlayer(dt) {
   aimRing.position.set(aimPoint.x, .03, aimPoint.z);
   aimRing.visible = state.playing && !state.modal;
   if (state.nightFactor > .02) {
-    flash.intensity = state.nightFactor * 4.3 + (state.shotPulse || 0) * 42;
+    flash.intensity = state.nightFactor * 26 + (state.shotPulse || 0) * 60;
     flash.position.set(wx + ax * .35, 1.5, wz + az * .35);
     flash.target.position.set(wx + ax * 8.5, 0, wz + az * 8.5);
     flash.target.updateMatrixWorld();
@@ -517,9 +519,6 @@ function updatePlayer(dt) {
 
 ```js
 ````javascript
-/* ---------------- flow field ---------------- */
-const flow = new Int16Array(MAPW * MAPH);
-const qx = new Int16Array(MAPW * MAPH), qy = new Int16Array(MAPW * MAPH);
 function computeFlow() {
   flow.fill(-1);
   const sx = clamp(Math.floor(player.gx), 0, MAPW - 1), sy = clamp(Math.floor(player.gy), 0, MAPH - 1);
@@ -823,13 +822,13 @@ function updateDayCycle(dt) {
   let envMode = 'dusk';
   function setNight(f) {
     f = clamp(f, 0, 1);
-    sun.intensity = lerp(2.5, .42, f);
+    sun.intensity = lerp(2.85, .42, f);
     sun.color.setHSL(lerp(.09, .58, f), lerp(.62, .28, f), lerp(.66, .62, f));
     fill.intensity = lerp(.35, .1, f);
-    hemi.intensity = lerp(.9, .26, f);
+    hemi.intensity = lerp(1.0, .3, f);
     hemi.color.copy(daySky).lerp(nightSky, f);
     hemi.groundColor.copy(dayGnd).lerp(nightGnd, f);
-    ambient.intensity = lerp(.28, .14, f);
+    ambient.intensity = lerp(.36, .18, f);
     scene.fog.color.copy(dayCol).lerp(nightCol, f);
     bg.copy(scene.fog.color);
     scene.fog.density = lerp(.0115, .019, f);
@@ -871,7 +870,6 @@ function updateDayCycle(dt) {
 
 ```js
 ````javascript
-const SAVE_KEY = 'lastlight.deadcounty.v1';
 function saveGame() {
   if (!state.playing || state.gameOver || state.mode !== 'play') return;
   try {

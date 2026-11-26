@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LAST LIGHT — Source &amp; Teaching Pack</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230d120e'/><circle cx='16' cy='16' r='7' fill='%23d6e675'/></svg>">
 <style>
   :root{--bg:#0d120e;--panel:#141b14;--line:#39442f;--ink:#e7e8d9;--muted:#98a092;--lime:#d6e675;--amber:#e2b566}
   *{box-sizing:border-box}
@@ -49,8 +50,8 @@
 
   <div class="bar">
     <div class="tabs">
-      <button id="tabLearn" class="on">Teaching pack · 41KB</button>
-      <button id="tabFull">Full source · 195KB</button>
+      <button id="tabLearn" class="on">Teaching pack</button>
+      <button id="tabFull">Full source</button>
     </div>
     <div class="grow"></div>
     <button class="primary" id="copy">Copy all</button>
@@ -97,7 +98,7 @@ async function load(key) {
     text = body;
     view.textContent = body;
     const lines = body.split('\n').length;
-    meta.textContent = `${FILES[key].label} · ${lines.toLocaleString()} lines · ${FILES[key].bytes} · ${FILES[key].url}`;
+    meta.textContent = `${FILES[key].label} · ${lines.toLocaleString()} lines · ${Math.round(body.length / 1024)} KB · ${FILES[key].url}`;
     scrollTo({ top: 0, behavior: 'instant' });
   } catch (e) {
     if (id !== seq) return;
