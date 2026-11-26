@@ -146,6 +146,8 @@ body.hurt .bloodscreen{opacity:1}
 .controls-note b{color:#c6ccb8;font-weight:400}
 .tag{margin-top:19px;font:8px 'DM Mono',monospace;color:#66715f;letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
 .tag:before{content:'';width:5px;height:5px;background:var(--lime);border-radius:50%;box-shadow:0 0 10px var(--lime)}
+.src-link{display:inline-block;margin-top:12px;font:8px 'DM Mono',monospace;color:#7f8b78;letter-spacing:.15em;text-transform:uppercase;text-decoration:none;border-bottom:1px dotted #4d5844;padding-bottom:2px}
+.src-link:hover{color:var(--lime);border-color:var(--lime)}
 .aerial-label{position:absolute;z-index:2;right:5vw;top:9vh;text-align:right;pointer-events:none}
 .aerial-label span{font:8px 'DM Mono',monospace;letter-spacing:.24em;color:#c9d4bd;display:flex;align-items:center;justify-content:flex-end;gap:8px}
 .aerial-label span:before{content:'';width:6px;height:6px;border-radius:50%;background:#e26951;box-shadow:0 0 10px #e26951;animation:pulse 1.7s infinite}
@@ -215,6 +217,7 @@ body.hurt .bloodscreen{opacity:1}
   .start{padding:12px 19px;font-size:13px}
   .controls-note{display:none}
   .tag{margin-top:14px;font-size:7px}
+  .src-link{display:none}
   .aerial-label{top:72px;right:16px}
   .aerial-frame{display:none}
   .loading{left:22px;bottom:calc(14px + var(--safe));font-size:7px}
@@ -361,6 +364,7 @@ body.hurt .bloodscreen{opacity:1}
       </div>
       <div class="controls-note"><b>WASD</b> move &nbsp;·&nbsp; <b>MOUSE</b> aim &nbsp;·&nbsp; <b>CLICK</b> strike &nbsp;·&nbsp; <b>E</b> use &nbsp;·&nbsp; <b>F</b> board &nbsp;·&nbsp; <b>SHIFT</b> sprint &nbsp;·&nbsp; <b>C</b> craft &nbsp;·&nbsp; <b>WHEEL</b> zoom</div>
       <div class="tag">No one's coming · make your own way</div>
+      <a class="src-link" href="./source.html">Source code · Claude pack →</a>
     </div>
     <div class="aerial-label"><span>LIVE AERIAL</span><b>WEST MERCER · 16:42 · LIGHT RAIN</b></div>
     <div class="aerial-frame"><i>CAM 04 · ROOFTOP</i><i>36°12'N · 94°08'W</i></div>

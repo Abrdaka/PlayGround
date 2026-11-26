@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LAST LIGHT — Source &amp; Teaching Pack</title>
+<style>
+  :root{--bg:#0d120e;--panel:#141b14;--line:#39442f;--ink:#e7e8d9;--muted:#98a092;--lime:#d6e675;--amber:#e2b566}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+  header{position:sticky;top:0;z-index:5;background:rgba(11,16,12,.96);border-bottom:1px solid var(--line);padding:14px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .brand{font:800 13px/1 ui-monospace,monospace;letter-spacing:.26em;text-transform:uppercase}
+  .brand b{color:var(--lime)}
+  header .spacer{flex:1}
+  button,a.btn{font:600 11px/1 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);background:#1d261a;color:var(--ink);padding:10px 13px;border-radius:3px;text-decoration:none;cursor:pointer}
+  button:hover,a.btn:hover{border-color:var(--lime);color:var(--lime)}
+  button.primary{background:var(--lime);color:#161d12;border-color:var(--lime)}
+  button.primary:hover{background:#e4f28d;color:#111}
+  main{max-width:1100px;margin:0 auto;padding:22px 20px 80px}
+  h1{font:800 30px/1.05 ui-sans-serif,system-ui;margin:6px 0 8px;letter-spacing:.01em}
+  p.lead{color:var(--muted);font-size:14px;line-height:1.6;margin:0 0 18px;max-width:70ch}
+  .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0 10px}
+  .bar .grow{flex:1}
+  .tabs{display:flex;gap:6px;margin:6px 0 0;flex-wrap:wrap}
+  .tabs button.on{background:var(--lime);color:#161d12;border-color:var(--lime)}
+  pre{background:#0a0f0b;border:1px solid var(--line);border-radius:4px;padding:16px;overflow:auto;max-height:70vh;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre;tab-size:2}
+  .meta{font:11px/1.5 ui-monospace,monospace;color:#7f8a79;letter-spacing:.04em;margin:8px 0 0}
+  .note{border-left:3px solid var(--lime);padding:10px 14px;background:#131a13;color:#b9c2ae;font-size:13px;line-height:1.55;margin:16px 0}
+  .note b{color:var(--lime)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,10px);background:#d6e675;color:#161d12;font:700 12px ui-monospace,monospace;padding:11px 18px;border-radius:3px;opacity:0;transition:.2s;pointer-events:none}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  @media(max-width:700px){header{padding:12px 14px}main{padding:16px 14px 70px}h1{font-size:23px}pre{font-size:11px;max-height:62vh}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><b>LAST</b> LIGHT · SOURCE</div>
+  <div class="spacer"></div>
+  <a class="btn" href="./index.html">← Play</a>
+  <a class="btn" href="./LAST-LIGHT-FULL-SOURCE.md" download>Download .md</a>
+  <a class="btn" href="./dist/last-light-source.zip" download>Download .zip</a>
+</header>
+<main>
+  <h1>الكود الكامل + حزمة تعليم Claude</h1>
+  <p class="lead">
+    هذا عارض مباشر للكود. اضغط <b>Copy all</b> ثم الصقه في Claude، أو نزّل الملف/المشروع.
+    حزمة التعليم أقصر (1000 سطر) وتشرح القرارات، بينما الملف الكامل يحتوي كل شيء (4000 سطر).
+  </p>
+
+  <div class="bar">
+    <div class="tabs">
+      <button id="tabLearn" class="on">Teaching pack · 41KB</button>
+      <button id="tabFull">Full source · 195KB</button>
+    </div>
+    <div class="grow"></div>
+    <button class="primary" id="copy">Copy all</button>
+  </div>
+
+  <div class="note">
+    <b>برومبت جاهز:</b> «Read this teaching pack. First give me a one-page system map and the 8 decisions behind the aerial realistic look. Then we will rebuild a new game with the same architecture: grid world, colliders, flow-field AI, combat, HUD, save. No external assets.»
+  </div>
+
+  <pre id="view">Loading…</pre>
+  <p class="meta" id="meta"></p>
+</main>
+<div class="toast" id="toast">Copied</div>
+<script>
+const FILES = {
+  learn: { url: './CLAUDE-LEARN-LAST-LIGHT.md', label: 'Teaching pack', bytes: '41 KB' },
+  full:  { url: './LAST-LIGHT-FULL-SOURCE.md', label: 'Full source', bytes: '195 KB' }
+};
+const view = document.getElementById('view');
+const meta = document.getElementById('meta');
+const toastEl = document.getElementById('toast');
+let current = 'learn';
+let text = '';
+let seq = 0;
+
+function toast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('on');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toastEl.classList.remove('on'), 1600);
+}
+
+async function load(key) {
+  current = key;
+  document.getElementById('tabLearn').classList.toggle('on', key === 'learn');
+  document.getElementById('tabFull').classList.toggle('on', key === 'full');
+  view.textContent = 'Loading…';
+  const id = ++seq;
+  try {
+    const res = await fetch(FILES[key].url, { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const body = await res.text();
+    if (id !== seq) return;
+    text = body;
+    view.textContent = body;
+    const lines = body.split('\n').length;
+    meta.textContent = `${FILES[key].label} · ${lines.toLocaleString()} lines · ${FILES[key].bytes} · ${FILES[key].url}`;
+    scrollTo({ top: 0, behavior: 'instant' });
+  } catch (e) {
+    if (id !== seq) return;
+    text = '';
+    view.textContent =
+      'Could not load the file.\n\n' +
+      'Serve the folder over HTTP (python3 -m http.server 8080) and open /source.html.\n' +
+      'Opening this page via file:// blocks fetch for security.\n\n' + e;
+    meta.textContent = 'load failed';
+  }
+}
+
+async function copyAll() {
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('Copied ' + Math.round(text.length / 1024) + ' KB');
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    toast(ok ? 'Copied' : 'Select the text and copy manually');
+  }
+}
+
+document.getElementById('tabLearn').onclick = () => load('learn');
+document.getElementById('tabFull').onclick = () => load('full');
+document.getElementById('copy').onclick = copyAll;
+load('learn');
+</script>
+</body>
+</html>
