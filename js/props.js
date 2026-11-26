@@ -319,9 +319,13 @@ export function createPropKit(TEX) {
   function makePuddle(x, z, sx, sz, rot) {
     const geo = new THREE.CircleGeometry(1, 22);
     geo.rotateX(-Math.PI / 2);
-    const m = new THREE.Mesh(geo, M.asphalt);
-    m.position.set(x, .015, z); m.scale.set(sx, 1, sz); m.rotation.y = rot;
-    m.receiveShadow = true;
+    const water = new THREE.MeshPhysicalMaterial({
+      color: 0x4a5652, roughness: .12, metalness: 0, transparent: true, opacity: .5,
+      envMapIntensity: 1.2, clearcoat: 1, clearcoatRoughness: .08, depthWrite: false,
+    });
+    const m = new THREE.Mesh(geo, water);
+    m.position.set(x, .02, z); m.scale.set(sx, 1, sz); m.rotation.y = rot;
+    m.receiveShadow = true; m.renderOrder = 1;
     return m;
   }
 

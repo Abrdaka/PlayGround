@@ -197,7 +197,7 @@ export function buildZombie(variant = 0) {
   const mouth = new THREE.Mesh(new THREE.BoxGeometry(.08, .035, .02), new THREE.MeshBasicMaterial({ color: 0x2b0f0c }));
   mouth.position.set(0, -.055, .12); head.add(mouth);
   for (const sx of [-1, 1]) {
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(.014, 6, 4), new THREE.MeshBasicMaterial({ color: 0xcfcbb0 }));
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(.018, 6, 4), new THREE.MeshBasicMaterial({ color: 0xe4dcb4 }));
     eye.position.set(sx * .05, .03, .12); head.add(eye);
   }
 

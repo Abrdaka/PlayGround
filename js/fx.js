@@ -1,6 +1,6 @@
 /* LAST LIGHT — weather and impact effects */
 import * as THREE from '../vendor/three.module.min.js';
-import { mulberry32 } from './core.js';
+import { mulberry32, cellAt } from './core.js';
 
 export function createRain(scene) {
   const COUNT = 1300;
@@ -27,6 +27,14 @@ export function createRain(scene) {
   for (let i = 0; i < COUNT; i++) { drops.push({}); reset(i, focus0, true); }
   function write(i) {
     const d = drops[i], o = i * 6;
+    // Interiors read as a roof cutaway: keep the rain outside.
+    const ch = cellAt(Math.floor(d.x / 2 + 18), Math.floor(d.z / 2 + 18));
+    if (ch === 't' || ch === 'F' || ch === 'c') {
+      pos[o] = pos[o + 3] = 0;
+      pos[o + 1] = pos[o + 4] = -60;
+      pos[o + 2] = pos[o + 5] = 0;
+      return;
+    }
     pos[o] = d.x; pos[o + 1] = d.y; pos[o + 2] = d.z;
     pos[o + 3] = d.x - .12 * d.len; pos[o + 4] = d.y - d.len; pos[o + 5] = d.z;
   }

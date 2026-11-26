@@ -337,6 +337,7 @@ SAVE_KEY = 'lastlight.deadcounty.v1'
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d120e">
 <title>LAST LIGHT — Dead County · Aerial Survival</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230d120e'/><circle cx='16' cy='16' r='7' fill='%23d6e675'/></svg>">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
 :root{
@@ -530,15 +531,15 @@ body.hurt .bloodscreen{opacity:1}
   .objective span{font-size:7.5px}
   .objective .timer{font-size:8px}
   .threat{top:110px;font-size:7.5px;letter-spacing:.13em}
-  .hud{left:8px;bottom:calc(8px + var(--safe));width:152px;padding:9px 10px}
+  .hud{left:8px;bottom:calc(150px + var(--safe));width:152px;padding:9px 10px}
   .hud-head{font-size:7px}
   .bars{gap:5px;margin-top:8px}
   .barline{grid-template-columns:34px 1fr 20px;font-size:7px;gap:5px}
   .perimeter{font-size:6.5px;line-height:1.7;margin-top:7px;padding-top:6px}
   .hint{display:none}
   .kit{display:none}
-  .prompt{bottom:calc(198px + var(--safe));font-size:11px;padding:7px 11px}
-  .prompt.sub{bottom:calc(236px + var(--safe));font-size:10px}
+  .prompt{bottom:calc(292px + var(--safe));font-size:11px;padding:7px 11px}
+  .prompt.sub{bottom:calc(330px + var(--safe));font-size:10px}
   .mobile-controls{display:block}
   .reticle{display:none}
   .intro{background:linear-gradient(180deg,rgba(5,9,6,.97) 0%,rgba(6,10,7,.9) 46%,rgba(7,12,8,.6) 100%);align-items:flex-end}
@@ -1569,9 +1570,13 @@ export function createPropKit(TEX) {
   function makePuddle(x, z, sx, sz, rot) {
     const geo = new THREE.CircleGeometry(1, 22);
     geo.rotateX(-Math.PI / 2);
-    const m = new THREE.Mesh(geo, M.asphalt);
-    m.position.set(x, .015, z); m.scale.set(sx, 1, sz); m.rotation.y = rot;
-    m.receiveShadow = true;
+    const water = new THREE.MeshPhysicalMaterial({
+      color: 0x4a5652, roughness: .12, metalness: 0, transparent: true, opacity: .5,
+      envMapIntensity: 1.2, clearcoat: 1, clearcoatRoughness: .08, depthWrite: false,
+    });
+    const m = new THREE.Mesh(geo, water);
+    m.position.set(x, .02, z); m.scale.set(sx, 1, sz); m.rotation.y = rot;
+    m.receiveShadow = true; m.renderOrder = 1;
     return m;
   }
 
@@ -2010,7 +2015,7 @@ export function buildZombie(variant = 0) {
   const mouth = new THREE.Mesh(new THREE.BoxGeometry(.08, .035, .02), new THREE.MeshBasicMaterial({ color: 0x2b0f0c }));
   mouth.position.set(0, -.055, .12); head.add(mouth);
   for (const sx of [-1, 1]) {
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(.014, 6, 4), new THREE.MeshBasicMaterial({ color: 0xcfcbb0 }));
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(.018, 6, 4), new THREE.MeshBasicMaterial({ color: 0xe4dcb4 }));
     eye.position.set(sx * .05, .03, .12); head.add(eye);
   }
 
@@ -2068,7 +2073,7 @@ export function animateZombie(m, { time, speed, aiming, lunge }) {
 ````javascript
 /* LAST LIGHT — weather and impact effects */
 import * as THREE from '../vendor/three.module.min.js';
-import { mulberry32 } from './core.js';
+import { mulberry32, cellAt } from './core.js';
 
 export function createRain(scene) {
   const COUNT = 1300;
@@ -2095,6 +2100,14 @@ export function createRain(scene) {
   for (let i = 0; i < COUNT; i++) { drops.push({}); reset(i, focus0, true); }
   function write(i) {
     const d = drops[i], o = i * 6;
+    // Interiors read as a roof cutaway: keep the rain outside.
+    const ch = cellAt(Math.floor(d.x / 2 + 18), Math.floor(d.z / 2 + 18));
+    if (ch === 't' || ch === 'F' || ch === 'c') {
+      pos[o] = pos[o + 3] = 0;
+      pos[o + 1] = pos[o + 4] = -60;
+      pos[o + 2] = pos[o + 5] = 0;
+      return;
+    }
     pos[o] = d.x; pos[o + 1] = d.y; pos[o + 2] = d.z;
     pos[o + 3] = d.x - .12 * d.len; pos[o + 4] = d.y - d.len; pos[o + 5] = d.z;
   }
@@ -2397,11 +2410,11 @@ export function buildWorld(scene, renderer) {
   scene.background = bg;
   scene.fog = new THREE.FogExp2(0x43503f, .012);
 
-  const hemi = new THREE.HemisphereLight(0xa9b7ae, 0x2b2f24, .9);
+  const hemi = new THREE.HemisphereLight(0xa9b7ae, 0x2b2f24, 1.0);
   scene.add(hemi);
-  const ambient = new THREE.AmbientLight(0x4d5b58, .28);
+  const ambient = new THREE.AmbientLight(0x4d5b58, .36);
   scene.add(ambient);
-  const sun = new THREE.DirectionalLight(0xffd6a2, 2.5);
+  const sun = new THREE.DirectionalLight(0xffd6a2, 2.85);
   sun.position.set(-34, 38, 24);
   sun.target.position.set(0, 0, 0);
   sun.castShadow = true;
@@ -2708,13 +2721,13 @@ export function buildWorld(scene, renderer) {
   let envMode = 'dusk';
   function setNight(f) {
     f = clamp(f, 0, 1);
-    sun.intensity = lerp(2.5, .42, f);
+    sun.intensity = lerp(2.85, .42, f);
     sun.color.setHSL(lerp(.09, .58, f), lerp(.62, .28, f), lerp(.66, .62, f));
     fill.intensity = lerp(.35, .1, f);
-    hemi.intensity = lerp(.9, .26, f);
+    hemi.intensity = lerp(1.0, .3, f);
     hemi.color.copy(daySky).lerp(nightSky, f);
     hemi.groundColor.copy(dayGnd).lerp(nightGnd, f);
-    ambient.intensity = lerp(.28, .14, f);
+    ambient.intensity = lerp(.36, .18, f);
     scene.fog.color.copy(dayCol).lerp(nightCol, f);
     bg.copy(scene.fog.color);
     scene.fog.density = lerp(.0115, .019, f);
@@ -2888,7 +2901,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.02;
+renderer.toneMappingExposure = 1.1;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(42, 1, .1, 260);
@@ -2923,13 +2936,18 @@ for (const k of ['shiv', 'bat', 'pistol']) {
   weaponModels[k] = m;
 }
 
-const flash = new THREE.SpotLight(0xffe8c0, 0, 32, .5, .6, 1.35);
+const flash = new THREE.SpotLight(0xffe8c0, 0, 26, .44, .55, 1.15);
 flash.castShadow = true;
 flash.shadow.mapSize.set(512, 512);
 flash.shadow.bias = -.0015;
 flash.shadow.camera.near = .4;
 flash.shadow.camera.far = 32;
 scene.add(flash, flash.target);
+
+// A soft overhead pool keeps the survivor readable in the dark without
+// washing out the night. It reads as sky/bounce light, not a lamp.
+const playerLight = new THREE.PointLight(0xcfdac2, 0, 6.2, 2);
+scene.add(playerLight);
 
 const aimRing = new THREE.Mesh(
   new THREE.RingGeometry(.8, .9, 30),
@@ -3102,12 +3120,14 @@ function updateHud() {
   ui.perimeter.textContent = breached ? 'BREACHED' : secure ? 'SECURE' : partial ? 'PARTIAL' : 'UNSECURED';
   ui.perimeter.style.color = breached ? '#e26951' : secure ? '#d6e675' : partial ? '#e2b566' : '#9aa493';
   document.body.classList.toggle('hurt', player.hp < 35 && player.hp > 0);
-  ui.threat.classList.toggle('on', state.night && state.playing);
-  if (state.night) ui.threat.innerHTML = breached ? '<i></i>THEY ARE INSIDE THE HOUSE' : '<i></i>THE DEAD ARE DRAWN TO NOISE';
+  ui.threat.classList.toggle('on', (state.night || breached) && state.playing);
+  if (state.night || breached) ui.threat.innerHTML = breached ? '<i></i>THEY ARE INSIDE THE HOUSE' : '<i></i>THE DEAD ARE DRAWN TO NOISE';
   // objective copy
   if (state.playing) {
-    if (state.night) {
-      ui.goal.textContent = breached ? 'They are inside. Fight or flee.' : 'Hold the safehouse until dawn.';
+    if (breached) {
+      ui.goal.textContent = 'They are inside. Fight or flee.';
+    } else if (state.night) {
+      ui.goal.textContent = 'Hold the safehouse until dawn.';
     } else if (secure) {
       ui.goal.textContent = 'Perimeter secure. Hold until nightfall.';
     } else if (partial) {
@@ -3775,6 +3795,8 @@ function updatePlayer(dt) {
 
   const wx = worldX(player.gx), wz = worldZ(player.gy);
   survivor.root.position.set(wx, 0, wz);
+  playerLight.position.set(wx, 3.4, wz);
+  playerLight.intensity = state.nightFactor * 4.2;
   animateSurvivor(survivor, {
     time: clock.elapsedTime, speed: player.speed * CELL, aiming: player.aim,
     attackT: player.attackT, torchOn: state.nightFactor > .05,
@@ -3784,7 +3806,7 @@ function updatePlayer(dt) {
   aimRing.position.set(aimPoint.x, .03, aimPoint.z);
   aimRing.visible = state.playing && !state.modal;
   if (state.nightFactor > .02) {
-    flash.intensity = state.nightFactor * 4.3 + (state.shotPulse || 0) * 42;
+    flash.intensity = state.nightFactor * 26 + (state.shotPulse || 0) * 60;
     flash.position.set(wx + ax * .35, 1.5, wz + az * .35);
     flash.target.position.set(wx + ax * 8.5, 0, wz + az * 8.5);
     flash.target.updateMatrixWorld();
@@ -4074,10 +4096,11 @@ requestAnimationFrame(frame);
 
 // Small debug surface used by the automated play-test harness.
 window.__lastlight = {
-  state, player, resources, world,
+  state, player, resources, world, renderer, scene, camera,
   get zombies() { return zombies; },
   get weapon() { return weapon; },
   findNear, interact, attack, boardUp, useCar, startFresh, endGame, setWeapon,
+  spawnZombie, saveGame, craft, hurt, updateHud,
   get save() { return loadSave(); },
 };
 
