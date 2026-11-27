@@ -97,24 +97,32 @@ export const LANDMARKS = {
   hardware: { gx: 4.5, gy: 4.5, name: 'HARDWARE STORE' },
   ransacked: { gx: 27.5, gy: 27.5, name: 'RANSACKED HOUSE' },
   shed: { gx: 3.5, gy: 23.5, name: 'TOOL SHED' },
+  trader: { gx: 13.0, gy: 20.5, name: 'MERCER TRADER CAMP' },
+  workbench: { gx: 10.9, gy: 26.8, name: 'SAFEHOUSE WORKBENCH' },
 };
 
+/* Each container carries a type that selects its weighted loot table,
+   plus a tier (1 common, 2 good, 3 rare) that adds extra rolls. */
 export const LOOT_SPOTS = [
-  { gx: 4.5, gy: 4.5, label: 'Hardware store · supplies', loot: { wood: 4, scrap: 2, parts: 1 } },
-  { gx: 28.5, gy: 5.5, label: 'Corner store · provisions', loot: { food: 2, cloth: 1, chem: 1 } },
-  { gx: 27.5, gy: 27.5, label: 'Ransacked house · cabinets', loot: { cloth: 2, chem: 1, food: 1 } },
-  { gx: 3.5, gy: 23.5, label: 'Tool shed · workbench', loot: { wood: 3, scrap: 2, parts: 1 } },
-  { gx: 18.5, gy: 6.5, label: 'Police cruiser · evidence', loot: { ammo: 2, scrap: 2, parts: 1 } },
-  { gx: 18.5, gy: 25.5, label: 'Roadside duffel', loot: { food: 1, ammo: 1, fuel: 1 } },
-  { gx: 28.5, gy: 18.5, label: 'Overturned cart', loot: { scrap: 1, chem: 1, cloth: 1 } },
-  { gx: 4.5, gy: 11.5, label: 'House · kitchen drawers', loot: { fuel: 1, cloth: 1 } },
-  { gx: 23.5, gy: 11.5, label: 'House · hallway closet', loot: { wood: 2, food: 1 } },
+  { gx: 4.5, gy: 4.5, label: 'Hardware store · supplies', type: 'hardware', tier: 2 },
+  { gx: 28.5, gy: 5.5, label: 'Corner store · provisions', type: 'store', tier: 1 },
+  { gx: 27.5, gy: 27.5, label: 'Ransacked house · cabinets', type: 'house', tier: 1 },
+  { gx: 3.5, gy: 23.5, label: 'Tool shed · workbench', type: 'tools', tier: 2 },
+  { gx: 18.5, gy: 6.5, label: 'Police cruiser · evidence', type: 'police', tier: 3 },
+  { gx: 18.5, gy: 25.5, label: 'Roadside duffel', type: 'duffel', tier: 1 },
+  { gx: 28.5, gy: 18.5, label: 'Overturned cart', type: 'store', tier: 1 },
+  { gx: 4.5, gy: 11.5, label: 'House · kitchen drawers', type: 'house', tier: 1 },
+  { gx: 23.5, gy: 11.5, label: 'House · hallway closet', type: 'house', tier: 1 },
+  { gx: 30.0, gy: 3.0, label: 'House · medicine cabinet', type: 'medical', tier: 2 },
+  { gx: 30.0, gy: 30.0, label: 'Ransacked house · bedroom', type: 'house', tier: 2 },
+  { gx: 11.6, gy: 30.4, label: 'Safehouse · survival cache', type: 'starter', tier: 1,
+    fixed: { w_shiv: 1, scrap: 2, cloth: 2, food: 1, dukes: 18 } },
 ];
 
 export const ZOMBIE_SPAWNS = [
   [17.5, 8.5], [17.5, 13.5], [25.5, 17.5], [30.5, 17.5],
   [17.5, 30.5], [10.5, 17.5], [2.5, 14.5], [23.5, 21.5],
-  [12.5, 21.5], [33.0, 23.5]
+  [22.5, 21.5], [33.0, 23.5]
 ];
 
 export const NIGHT_SPAWNS = [

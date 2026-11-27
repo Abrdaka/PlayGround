@@ -100,6 +100,89 @@ export function buildSurvivor() {
   return { root, body, head, armL, armR, legL, legR, weaponMount, torch, lens, walkPhase: 0, swing: 0 };
 }
 
+/* The trader is deliberately built from a different silhouette: long coat,
+   wide hat, lantern arm. He never fights, so he only needs an idle. */
+export function buildTrader() {
+  const root = new THREE.Group();
+  const body = new THREE.Group(); root.add(body);
+  const coat = cloth(0x3c3a2c, .96);
+  const coatDark = cloth(0x2a2920, .98);
+  const shirt = cloth(0x6b5940, .94);
+  const skinMat = skin(0x9d7658);
+  const hatMat = cloth(0x241f18, .92);
+  const brass = new THREE.MeshStandardMaterial({ color: 0xc7a45e, roughness: .42, metalness: .65 });
+
+  const torso = shadowify(new THREE.Mesh(new THREE.CapsuleGeometry(.235, .52, 4, 10), coat));
+  torso.position.y = 1.15; torso.scale.set(1.08, 1, .86); body.add(torso);
+  const apron = shadowify(new THREE.Mesh(new THREE.BoxGeometry(.38, .5, .06), shirt));
+  apron.position.set(0, 1.02, .19); body.add(apron);
+  const belt = shadowify(new THREE.Mesh(new THREE.CylinderGeometry(.225, .225, .08, 10), coatDark));
+  belt.position.y = .86; belt.scale.z = .85; body.add(belt);
+  const buckle = shadowify(new THREE.Mesh(new THREE.BoxGeometry(.09, .07, .03), brass));
+  buckle.position.set(0, .87, .2); body.add(buckle);
+
+  const neck = shadowify(new THREE.Mesh(new THREE.CylinderGeometry(.06, .07, .1, 8), skinMat));
+  neck.position.y = 1.48; body.add(neck);
+  const head = new THREE.Group(); head.position.y = 1.61; body.add(head);
+  const skull = shadowify(new THREE.Mesh(new THREE.SphereGeometry(.14, 16, 12), skinMat));
+  skull.position.y = .03; head.add(skull);
+  const beard = shadowify(new THREE.Mesh(new THREE.BoxGeometry(.16, .1, .12), cloth(0x4a4034, .99)));
+  beard.position.set(0, -.06, .07); head.add(beard);
+  const brim = shadowify(new THREE.Mesh(new THREE.CylinderGeometry(.3, .31, .03, 16), hatMat));
+  brim.position.y = .13; head.add(brim);
+  const crown = shadowify(new THREE.Mesh(new THREE.CylinderGeometry(.14, .16, .17, 12), hatMat));
+  crown.position.y = .2; head.add(crown);
+  const band = shadowify(new THREE.Mesh(new THREE.CylinderGeometry(.163, .163, .035, 12), brass));
+  band.position.y = .135; head.add(band);
+
+  const armPivot = (sx) => {
+    const p = new THREE.Group(); p.position.set(sx * .275, 1.4, 0); body.add(p);
+    const upper = shadowify(new THREE.Mesh(new THREE.CapsuleGeometry(.068, .28, 3, 8), coat));
+    upper.position.y = -.17; p.add(upper);
+    const fore = shadowify(new THREE.Mesh(new THREE.CapsuleGeometry(.058, .27, 3, 8), coat));
+    fore.position.set(0, -.51, .02); p.add(fore);
+    const hand = shadowify(new THREE.Mesh(new THREE.SphereGeometry(.066, 8, 6), skinMat));
+    hand.position.set(0, -.68, .03); p.add(hand);
+    return p;
+  };
+  const armL = armPivot(-1), armR = armPivot(1);
+  armL.rotation.x = -.12; armR.rotation.x = -.35;
+
+  const legPivot = (sx) => {
+    const p = new THREE.Group(); p.position.set(sx * .12, .86, 0); body.add(p);
+    const thigh = shadowify(new THREE.Mesh(new THREE.CapsuleGeometry(.086, .3, 3, 8), coatDark));
+    thigh.position.y = -.2; p.add(thigh);
+    const shin = shadowify(new THREE.Mesh(new THREE.CapsuleGeometry(.068, .3, 3, 8), coatDark));
+    shin.position.y = -.54; p.add(shin);
+    const boot = shadowify(new THREE.Mesh(new THREE.BoxGeometry(.16, .13, .28), cloth(0x1b1b17, .75)));
+    boot.position.set(0, -.8, .04); p.add(boot);
+    return p;
+  };
+  const legL = legPivot(-1), legR = legPivot(1);
+
+  // Lantern hooked to the right hand.
+  const lantern = new THREE.Group(); lantern.position.set(.28, .74, .08); body.add(lantern);
+  const cage = new THREE.Mesh(new THREE.CylinderGeometry(.07, .08, .16, 6), brass);
+  lantern.add(cage);
+  const glass = new THREE.Mesh(new THREE.CylinderGeometry(.06, .07, .13, 8), new THREE.MeshBasicMaterial({ color: 0xffd48a }));
+  lantern.add(glass);
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0xffc47a, transparent: true, opacity: .5, blending: THREE.AdditiveBlending, depthWrite: false }));
+  glow.scale.set(1.1, 1.1, 1); lantern.add(glow);
+
+  root.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return { root, body, head, armL, armR, lantern, glow, walkPhase: 0 };
+}
+
+export function animateTrader(m, time) {
+  m.body.position.y = Math.sin(time * 1.1) * .008;
+  m.body.rotation.z = Math.sin(time * .53) * .008;
+  m.head.rotation.y = Math.sin(time * .37) * .18;
+  m.head.rotation.x = Math.sin(time * .29) * .04;
+  m.armR.rotation.x = -.35 + Math.sin(time * .9) * .03;
+  m.lantern.rotation.z = Math.sin(time * 1.4) * .05;
+  m.glow.material.opacity = .38 + Math.sin(time * 5.5) * .05;
+}
+
 export function animateSurvivor(m, { time, speed, aiming, attackT, torchOn }) {
   const moving = speed > .12;
   m.root.rotation.y = aiming;
@@ -147,6 +230,22 @@ export function buildWeapon(kind) {
     blade.position.z = .22; g.add(blade);
     const tip = new THREE.Mesh(new THREE.ConeGeometry(.022, .09, 4), steel);
     tip.rotation.x = Math.PI / 2; tip.position.z = .39; g.add(tip);
+  } else if (kind === 'machete') {
+    const grip = new THREE.Mesh(new THREE.CylinderGeometry(.026, .03, .18, 8), dark);
+    grip.rotation.x = Math.PI / 2; grip.position.z = .02; g.add(grip);
+    const blade = new THREE.Mesh(new THREE.BoxGeometry(.055, .012, .55), steel);
+    blade.position.z = .36; blade.rotation.y = .02; g.add(blade);
+    const tip = new THREE.Mesh(new THREE.ConeGeometry(.03, .12, 4), steel);
+    tip.rotation.x = Math.PI / 2; tip.position.z = .69; g.add(tip);
+    const guard = new THREE.Mesh(new THREE.BoxGeometry(.1, .025, .03), dark);
+    guard.position.z = .1; g.add(guard);
+  } else if (kind === 'sledge') {
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(.032, .028, .95, 10), wood);
+    shaft.rotation.x = Math.PI / 2; shaft.position.z = .34; g.add(shaft);
+    const head = new THREE.Mesh(new THREE.BoxGeometry(.13, .13, .3), steel);
+    head.position.z = .8; g.add(head);
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(.045, .045, .06, 10), dark);
+    band.rotation.x = Math.PI / 2; band.position.z = .62; g.add(band);
   } else if (kind === 'pistol') {
     const slide = new THREE.Mesh(new THREE.BoxGeometry(.055, .06, .3), steel);
     slide.position.set(0, .02, .16); g.add(slide);
@@ -157,6 +256,30 @@ export function buildWeapon(kind) {
     const guard = new THREE.Mesh(new THREE.TorusGeometry(.035, .007, 5, 8, Math.PI), steel);
     guard.rotation.y = Math.PI / 2; guard.position.set(0, -.055, .12); g.add(guard);
     const muzzle = new THREE.Object3D(); muzzle.position.set(0, .02, .32); g.add(muzzle);
+    g.userData.muzzle = muzzle;
+  } else if (kind === 'shotgun') {
+    const stock = new THREE.Mesh(new THREE.BoxGeometry(.06, .09, .3), wood);
+    stock.position.set(0, -.02, -.02); stock.rotation.x = -.08; g.add(stock);
+    const body = new THREE.Mesh(new THREE.BoxGeometry(.07, .08, .26), dark);
+    body.position.z = .2; g.add(body);
+    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(.026, .026, .72, 10), steel);
+    barrel.rotation.x = Math.PI / 2; barrel.position.set(0, .02, .55); g.add(barrel);
+    const tube = new THREE.Mesh(new THREE.CylinderGeometry(.02, .02, .6, 8), dark);
+    tube.rotation.x = Math.PI / 2; tube.position.set(0, -.035, .5); g.add(tube);
+    const pump = new THREE.Mesh(new THREE.BoxGeometry(.075, .055, .2), wood);
+    pump.position.set(0, -.02, .45); g.add(pump);
+    const muzzle = new THREE.Object3D(); muzzle.position.set(0, .02, .92); g.add(muzzle);
+    g.userData.muzzle = muzzle;
+  } else if (kind === 'rifle') {
+    const stock = new THREE.Mesh(new THREE.BoxGeometry(.055, .085, .38), wood);
+    stock.position.set(0, -.02, -.02); g.add(stock);
+    const body = new THREE.Mesh(new THREE.BoxGeometry(.06, .07, .3), dark);
+    body.position.z = .22; g.add(body);
+    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(.018, .018, .78, 10), steel);
+    barrel.rotation.x = Math.PI / 2; barrel.position.set(0, .02, .62); g.add(barrel);
+    const scope = new THREE.Mesh(new THREE.CylinderGeometry(.035, .035, .2, 10), dark);
+    scope.rotation.x = Math.PI / 2; scope.position.set(0, .09, .25); g.add(scope);
+    const muzzle = new THREE.Object3D(); muzzle.position.set(0, .02, 1.02); g.add(muzzle);
     g.userData.muzzle = muzzle;
   }
   g.traverse(o => { if (o.isMesh) { o.castShadow = true; } });

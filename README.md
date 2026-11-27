@@ -35,8 +35,9 @@ Gamepad-style desktop alternative: `Space` attacks, `Q` interacts.
 | Path | Purpose |
 | --- | --- |
 | `index.html` | UI shell, HUD, menus, mobile controls, styles |
-| `js/game.js` | Game loop, player, combat, zombies, day/night, saving |
-| `js/world.js` | Map assembly, colliders, line of sight, night lighting |
+| `js/game.js` | Game loop, player, combat, zombies, day/night, survival integration, saving |
+| `js/survival.js` | Modular loot, items, weapons, recipes, books, perks, trader stock, contracts |
+| `js/world.js` | Map assembly, colliders, line of sight, loot/trader/workbench placement, night lighting |
 | `js/core.js` | Grid math, pathfinding flow field, RNG, helpers |
 | `js/textures.js` | Procedural textures (asphalt, brick, wood, grass…) |
 | `js/props.js` | Street props, cars, puddles, debris |
@@ -70,10 +71,13 @@ Gamepad-style desktop alternative: `Space` attacks, `Q` interacts.
 - Grid flow-field pathfinding: zombies route around walls and through openings.
 - Boardable door and windows, breach states, and a "they are inside" alert.
 - Day → dusk → night cycle with dynamic lighting, lamps, rain and fog.
-- Melee and firearms with noise that attracts the dead.
-- Scavenging, crafting, hunger, healing, stamina, sprint and permadeath.
+- Melee and firearms with weapon condition, upgrades and noise that attracts the dead.
+- Loot tables, carry weight, inventory, crafting, workbenches and recipes unlocked by manuals.
+- Hunger, healing, bandaging, stamina, sprint, XP, levels, perk points and permadeath.
+- Traders with restocked supplies and services, plus claimable contracts and quest rewards.
 - Repairable car escape route, dawn survival ending, and autosave/continue.
-- Desktop keyboard + mouse, touch controls, and responsive HUD.
+- Desktop keyboard + mouse, touch controls, and a responsive mobile HUD.
+- Pure survival definitions in `js/survival.js`; world traders and workbenches are placed in `js/world.js`.
 
 ## License
 
