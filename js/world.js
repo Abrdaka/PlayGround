@@ -248,7 +248,9 @@ export function buildWorld(scene, renderer) {
     const onCar = carSpots.has(key);
     let prop = null;
     if (!onCar) {
-      const kind = def.label.includes('duffel') ? 'duffel' : (def.label.includes('store') || def.label.includes('Hardware')) ? 'counter' : 'crate';
+      const kind = def.type === 'duffel' ? 'duffel'
+        : (def.type === 'store' || def.type === 'hardware' || def.type === 'medical') ? 'counter'
+        : 'crate';
       prop = kit.makeLootProp(kind);
       prop.position.set(x, 0, z);
       prop.rotation.y = (def.gx * 2.3 + def.gy) % 3;
@@ -259,10 +261,103 @@ export function buildWorld(scene, renderer) {
     marker.position.set(x, 0, z);
     const spot = {
       kind: 'loot', gx: def.gx, gy: def.gy, wx: x, wz: z, label: def.label,
-      loot: { ...def.loot }, active: true, prop, marker,
+      type: def.type || 'house', tier: def.tier || 1,
+      loot: def.fixed ? { ...def.fixed } : {},
+      rolled: !!def.fixed,
+      active: true, prop, marker,
     };
     loot.push(spot); interactables.push(spot);
   }
+
+  /* ---------------- safehouse workbench ---------------- */
+  const wb = LANDMARKS.workbench;
+  const wbX = worldX(wb.gx), wbZ = worldZ(wb.gy);
+  const bench = new THREE.Group(); bench.position.set(wbX, 0, wbZ); bench.rotation.y = -.3; scene.add(bench);
+  const benchAdd = (mesh) => { mesh.castShadow = true; mesh.receiveShadow = true; bench.add(mesh); return mesh; };
+  const benchTop = benchAdd(new THREE.Mesh(new THREE.BoxGeometry(1.5, .09, .78), kit.M.wood));
+  benchTop.position.y = .88;
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+    const leg = benchAdd(new THREE.Mesh(new THREE.BoxGeometry(.09, .86, .09), kit.M.woodDark));
+    leg.position.set(sx * .64, .43, sz * .3);
+  }
+  const vice = benchAdd(new THREE.Mesh(new THREE.BoxGeometry(.2, .16, .24), kit.M.darkMetal));
+  vice.position.set(-.5, 1.0, .1);
+  const toolBox = benchAdd(new THREE.Mesh(new THREE.BoxGeometry(.34, .16, .2), kit.M.tarp));
+  toolBox.position.set(.42, 1.01, -.08);
+  const benchLamp = new THREE.PointLight(0xffd9a0, 0, 4.2, 2);
+  benchLamp.position.set(0, 2.0, 0); bench.add(benchLamp);
+  const benchBulb = new THREE.Mesh(new THREE.SphereGeometry(.05, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffe8bb }));
+  benchBulb.position.set(0, 1.9, 0); bench.add(benchBulb);
+  addBox(wbX, wbZ, .72, .38, 'prop');
+  const workbench = {
+    kind: 'workbench', gx: wb.gx, gy: wb.gy, wx: wbX, wz: wbZ,
+    label: 'SAFEHOUSE · WORKBENCH', active: true, marker: makeMarker(0x9fd0c4, 0),
+  };
+  workbench.marker.position.set(wbX, 0, wbZ);
+  interactables.push(workbench);
+
+  /* ---------------- trader camp ---------------- */
+  const tpos = LANDMARKS.trader;
+  const campX = worldX(tpos.gx), campZ = worldZ(tpos.gy);
+  const camp = new THREE.Group(); camp.position.set(campX, 0, campZ); scene.add(camp);
+  const campAdd = (mesh) => { mesh.castShadow = true; mesh.receiveShadow = true; camp.add(mesh); return mesh; };
+
+  const rug = campAdd(new THREE.Mesh(new THREE.BoxGeometry(3.6, .025, 3.4), new THREE.MeshStandardMaterial({ color: 0x4a3b28, roughness: .98 })));
+  rug.position.y = .012;
+  const canopy = campAdd(new THREE.Mesh(new THREE.BoxGeometry(3.5, .07, 3.3), kit.M.tarp));
+  canopy.position.y = 2.72;
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+    const pole = campAdd(new THREE.Mesh(new THREE.CylinderGeometry(.045, .055, 2.7, 7), kit.M.darkMetal));
+    pole.position.set(sx * 1.6, 1.35, sz * 1.5);
+  }
+  // counter at the south edge, trader stands behind it
+  const counter = campAdd(new THREE.Mesh(new THREE.BoxGeometry(1.8, .95, .72), kit.M.woodDark));
+  counter.position.set(0, .48, .55);
+  const counterTop = campAdd(new THREE.Mesh(new THREE.BoxGeometry(1.9, .07, .82), kit.M.wood));
+  counterTop.position.set(0, .99, .55);
+  addBox(campX, campZ + 1.1, .92, .4, 'prop');
+  for (const [sx, sz, rot] of [[-1.35, .9, .2], [1.45, 1.1, -.4], [-1.3, -1.0, .5]]) {
+    const crate = campAdd(new THREE.Mesh(new THREE.BoxGeometry(.52, .46, .46), kit.M.plank));
+    crate.position.set(sx, .23, sz); crate.rotation.y = rot;
+  }
+  const signMat = new THREE.MeshStandardMaterial({ color: 0x1a1c14, emissive: 0xe2b566, emissiveIntensity: .4, roughness: .8 });
+  const sign = campAdd(new THREE.Mesh(new THREE.BoxGeometry(1.15, .34, .05), signMat));
+  sign.position.set(0, 2.2, 1.52);
+
+  const campLights = [];
+  function makeCampLantern(x, z, y = 0) {
+    const g = kit.makeLantern();
+    g.position.set(x, y, z);
+    scene.add(g);
+    let lensMat = null;
+    g.traverse(o => { if (o.isMesh && o.material && o.material.emissive && !lensMat) lensMat = o.material; });
+    const light = new THREE.PointLight(0xffc887, 0, 9, 2);
+    light.position.set(x, y + 1.05, z); scene.add(light);
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: TEX.glow, color: 0xffd6a0, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+    glow.position.set(x, y + .35, z); glow.scale.set(2.2, 2.2, 1); scene.add(glow);
+    const entry = { light, glow, lensMat, phase: Math.random() * 9 };
+    campLights.push(entry);
+    return entry;
+  }
+  makeCampLantern(campX - 1.55, campZ + 1.35);
+  makeCampLantern(campX + 1.55, campZ + 1.35);
+  makeCampLantern(campX + .72, campZ + .55, .99);
+
+  const safeRing = new THREE.Mesh(
+    new THREE.RingGeometry(5.5, 5.8, 64),
+    new THREE.MeshBasicMaterial({ color: 0xe2b566, transparent: true, opacity: .08, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })
+  );
+  safeRing.rotation.x = -Math.PI / 2;
+  safeRing.position.set(campX, .025, campZ);
+  scene.add(safeRing);
+
+  const traderSpot = {
+    kind: 'trader', gx: tpos.gx, gy: tpos.gy, wx: campX, wz: campZ + .9,
+    label: 'MERCER · TRADER CAMP', active: true, safeR: 4.4,
+    marker: makeMarker(0xe2b566, 0),
+  };
+  traderSpot.marker.position.set(campX, 0, campZ + 1.4);
+  interactables.push(traderSpot);
 
   /* ---------------- props / vehicles / furniture ---------------- */
   const props = dressWorld({ scene, kit, addBox, addCircle, TEX });
@@ -370,6 +465,16 @@ export function buildWorld(scene, renderer) {
     props.porchLight.visible = f > .04;
     props.porchGlow.material.opacity = f * .5;
     props.porchBulb.material.emissiveIntensity = f * 2.4;
+    for (const l of campLights) {
+      l.light.visible = f > .04;
+      l.light.intensity = f * 7.5;
+      l.glow.material.opacity = f * .42;
+      if (l.lensMat) l.lensMat.emissiveIntensity = .25 + f * 2.1;
+    }
+    benchLamp.visible = f > .04;
+    benchLamp.intensity = f * 3.4;
+    safeRing.material.opacity = .055 + f * .075;
+    signMat.emissiveIntensity = .35 + f * 1.15;
     rain.material.opacity = lerp(.14, .3, f) * .75;
     dust.mesh.material.opacity = lerp(.18, .32, f);
     const want = f > .5 ? 'night' : 'dusk';
@@ -395,6 +500,13 @@ export function buildWorld(scene, renderer) {
       l.light.intensity = (f || 0) * 11 * flick;
       l.glow.material.opacity = (f || 0) * .55 * flick;
     }
+    for (let i = 0; i < campLights.length; i++) {
+      const l = campLights[i];
+      const flick = 1 + Math.sin(t * (2.1 + i * .37) + l.phase) * .07;
+      l.light.intensity = (f || 0) * 7.5 * flick;
+      l.glow.material.opacity = (f || 0) * .42 * flick;
+    }
+    safeRing.material.opacity = .055 + (f || 0) * (.075 + Math.sin(t * 1.6) * .018);
     for (const m of markers) {
       const p = (Math.sin(t * 2.2 + m.userData.phase) + 1) / 2;
       m.userData.ring.scale.setScalar(.92 + p * .16);
@@ -426,7 +538,7 @@ export function buildWorld(scene, renderer) {
   /* ---------------- public api ---------------- */
   const api = {
     scene, colliders, openings, loot, interactables, car, safeDoor, safeWindows,
-    pickup, props, markers,
+    pickup, props, markers, traderSpot, workbench,
     addBox, addCircle, addCircleCollider: addCircle, addBoxCollider: addBox,
     resolveCircle, lineOfSight, setNight, tick,
     addBlood: (x, z, s) => blood.add(x, z, s),
@@ -468,8 +580,9 @@ export function buildWorld(scene, renderer) {
       return 'damaged';
     },
     setOpeningState(o, s) {
-      o.reinforced = clamp(Number(s.reinforced) || 0, 0, 3);
-      o.hp = Math.max(1, Number(s.hp) || 100);
+      const reinforced = Number(s.reinforced), hp = Number(s.hp);
+      o.reinforced = clamp(Number.isFinite(reinforced) ? reinforced : 0, 0, 3);
+      o.hp = Math.max(0, Number.isFinite(hp) ? hp : 100);
       o.maxHp = o.hp;
       o.breached = !!s.breached;
       o.open = !!s.closed ? false : true;

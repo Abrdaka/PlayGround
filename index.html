@@ -149,6 +149,74 @@ body.hurt .bloodscreen{opacity:1}
 .tag:before{content:'';width:5px;height:5px;background:var(--lime);border-radius:50%;box-shadow:0 0 10px var(--lime)}
 .src-link{display:inline-block;margin-top:12px;font:8px 'DM Mono',monospace;color:#7f8b78;letter-spacing:.15em;text-transform:uppercase;text-decoration:none;border-bottom:1px dotted #4d5844;padding-bottom:2px}
 .src-link:hover{color:var(--lime);border-color:var(--lime)}
+/* ---------------- survival layer: XP, hotbar, status, traders ---------------- */
+.levelrow{display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;margin-top:9px;font:8px 'DM Mono',monospace;color:#aab3a2;letter-spacing:.08em}
+.levelrow b{color:var(--lime);font-weight:600}
+.track.xp{height:3px}
+.fill.xp{background:var(--lime);width:0}
+.fill.cond{background:#8fb7c9;width:100%}
+.cond-line{display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;margin-top:5px;font:7.5px 'DM Mono',monospace;color:#93a08f;letter-spacing:.08em}
+.walletrow{display:flex;justify-content:space-between;margin-top:6px;font:8px 'DM Mono',monospace;color:#aab3a2;letter-spacing:.08em}
+.walletrow b{color:var(--amber);font-weight:600}
+.hotbar{position:absolute;z-index:4;left:50%;bottom:calc(96px + var(--safe));transform:translateX(-50%);display:flex;gap:6px;pointer-events:none}
+.hslot{pointer-events:auto;min-width:56px;border:1px solid var(--line);background:rgba(10,15,11,.82);padding:5px 8px;font:8px 'DM Mono',monospace;color:#aab3a2;letter-spacing:.06em;text-align:center;backdrop-filter:blur(6px)}
+.hslot b{display:block;font:600 12px 'Barlow Condensed',sans-serif;color:#e6ead8;margin-top:2px;white-space:nowrap}
+.hslot.on{border-color:var(--lime);color:var(--lime);background:rgba(34,43,29,.9)}
+.hslot.on b{color:var(--lime)}
+.hslot small{display:block;font-size:6.5px;color:#7f8b78;margin-top:1px}
+.statuschips{position:absolute;z-index:8;left:50%;top:118px;transform:translateX(-50%);display:flex;gap:8px;pointer-events:none}
+.chip{pointer-events:auto;border:1px solid #8c4b3b;background:rgba(70,20,14,.92);color:#f3b6a6;font:9px 'DM Mono',monospace;letter-spacing:.1em;padding:7px 11px;display:none;animation:pulse 1.4s infinite}
+.chip.show{display:block}
+.floaters{position:absolute;z-index:9;inset:0;pointer-events:none;overflow:hidden}
+.floater{position:absolute;transform:translate(-50%,-50%);font:700 13px 'Barlow Condensed',sans-serif;color:#f3e7c6;text-shadow:0 1px 3px #000;animation:floatup .85s ease-out forwards;white-space:nowrap}
+.floater.crit{color:#ff9a6c;font-size:17px}
+@keyframes floatup{0%{opacity:0;margin-top:6px}15%{opacity:1}100%{opacity:0;margin-top:-34px}}
+.tabrow{display:flex;gap:6px;margin:12px 0 14px;flex-wrap:wrap}
+.tabrow button{border:1px solid var(--line);background:#1a2119;color:#aab3a2;font:9px 'DM Mono',monospace;letter-spacing:.1em;padding:8px 11px;text-transform:uppercase}
+.tabrow button.on{border-color:var(--lime);color:var(--lime);background:#222b1d}
+.lvlbar{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:#131a13;padding:10px 12px;margin-bottom:14px}
+.lvlbar .lv{font:800 26px 'Barlow Condensed',sans-serif;color:var(--lime);line-height:1}
+.lvlbar small{display:block;font:8px 'DM Mono',monospace;color:#98a092;letter-spacing:.1em}
+.lvlbar .track{flex:1}
+.lvlbar .pts{font:9px 'DM Mono',monospace;color:var(--amber);letter-spacing:.08em;white-space:nowrap}
+.perk-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.perk{border:1px solid var(--line);background:#171e16;padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+.perk strong{font-size:15px}
+.perk small{font:8px/1.4 'DM Mono',monospace;color:#98a292}
+.perk .pips{display:flex;gap:3px;flex-wrap:wrap}
+.perk .pips i{width:9px;height:4px;background:#333c30;display:block}
+.perk .pips i.on{background:var(--lime)}
+.perk button{align-self:flex-start;border:1px solid var(--line);background:#2a3424;color:var(--lime);font:8px 'DM Mono',monospace;letter-spacing:.08em;padding:6px 9px;text-transform:uppercase}
+.perk button:disabled{color:#6f7a68;border-color:#2a3227;background:#1a2018}
+.bookrow{display:flex;justify-content:space-between;gap:10px;align-items:center;border-top:1px solid var(--line);padding:9px 0}
+.bookrow small{display:block;font:8px/1.4 'DM Mono',monospace;color:#98a292;margin-top:2px}
+.bookrow button{border:0;background:var(--lime);color:#161d12;font:700 9px 'DM Mono',monospace;letter-spacing:.06em;padding:7px 10px;text-transform:uppercase;white-space:nowrap}
+.bookrow button:disabled{background:#333c31;color:#7d8676}
+.emptyhint{font:9px/1.6 'DM Mono',monospace;color:#7f8b78;border:1px dashed #39442f;padding:11px;margin-top:6px}
+.wallet{display:flex;justify-content:space-between;align-items:center;border:1px solid #5a4a2c;background:#1d1a12;padding:9px 12px;margin-bottom:12px;font:9px 'DM Mono',monospace;letter-spacing:.1em;color:#c9bfa0}
+.wallet b{color:var(--amber);font-size:15px}
+.trade-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;border-top:1px solid var(--line);padding:9px 0}
+.trade-row.owned{opacity:.5}
+.trade-row strong{font-size:15px;display:block}
+.trade-row small{font:8px/1.4 'DM Mono',monospace;color:#98a292;display:block}
+.price{font:10px 'DM Mono',monospace;color:var(--amber);white-space:nowrap}
+.trade-row button{border:0;background:var(--lime);color:#161d12;font:700 9px 'DM Mono',monospace;padding:7px 10px;letter-spacing:.06em;text-transform:uppercase}
+.trade-row button:disabled{background:#333c31;color:#7d8676}
+.quest{border:1px solid var(--line);background:#171e16;padding:11px 12px;margin-bottom:9px}
+.quest strong{font-size:15px}
+.quest small{display:block;font:8px/1.5 'DM Mono',monospace;color:#98a292;margin:3px 0 6px}
+.quest .prog{font:8px 'DM Mono',monospace;color:var(--amber);letter-spacing:.08em}
+.quest button{margin-top:7px;border:0;background:var(--lime);color:#161d12;font:700 9px 'DM Mono',monospace;padding:7px 10px;text-transform:uppercase}
+.quest button:disabled{background:#333c31;color:#7d8676}
+.wb-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border-top:1px solid var(--line);padding:10px 0}
+.wb-row strong{font-size:15px;display:block}
+.wb-row small{font:8px/1.5 'DM Mono',monospace;color:#98a292;display:block}
+.wb-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.wb-actions button{border:1px solid var(--line);background:#2a3424;color:var(--lime);font:8px 'DM Mono',monospace;padding:6px 8px;letter-spacing:.05em;text-transform:uppercase}
+.wb-actions button:disabled{color:#6f7a68;border-color:#2a3227;background:#1a2018}
+.meter{height:4px;background:#2b332a;margin-top:5px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--lime)}
+.meter i.low{background:var(--red)}
 .aerial-label{position:absolute;z-index:2;right:5vw;top:9vh;text-align:right;pointer-events:none}
 .aerial-label span{font:8px 'DM Mono',monospace;letter-spacing:.24em;color:#c9d4bd;display:flex;align-items:center;justify-content:flex-end;gap:8px}
 .aerial-label span:before{content:'';width:6px;height:6px;border-radius:50%;background:#e26951;box-shadow:0 0 10px #e26951;animation:pulse 1.7s infinite}
@@ -167,7 +235,7 @@ body.hurt .bloodscreen{opacity:1}
 #game.ready .loading{display:none}
 .end-screen{z-index:31;background:linear-gradient(90deg,rgba(5,9,6,.97),rgba(6,10,7,.8) 55%,rgba(8,13,9,.42))}
 .end-screen .intro-content{width:min(660px,80vw)}
-.end-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:20px 0 22px;max-width:460px}
+.end-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:20px 0 22px;max-width:560px}
 .end-stat{background:#121812;padding:11px 13px}
 .end-stat span{display:block;font:8px 'DM Mono',monospace;letter-spacing:.16em;color:#8f9a88;text-transform:uppercase}
 .end-stat b{display:block;font:700 24px 'Barlow Condensed',sans-serif;color:var(--lime);margin-top:3px}
@@ -201,15 +269,30 @@ body.hurt .bloodscreen{opacity:1}
   .threat{top:110px;font-size:7.5px;letter-spacing:.13em}
   .hud{left:8px;bottom:calc(150px + var(--safe));width:152px;padding:9px 10px}
   .hud-head{font-size:7px}
+  .levelrow{font-size:7px;margin-top:6px;gap:4px}
+  .levelrow b{font-size:8px}
+  .cond-line{display:none}
+  .walletrow{font-size:7px}
   .bars{gap:5px;margin-top:8px}
   .barline{grid-template-columns:34px 1fr 20px;font-size:7px;gap:5px}
   .perimeter{font-size:6.5px;line-height:1.7;margin-top:7px;padding-top:6px}
+  .mob-hide{display:none}
   .hint{display:none}
   .kit{display:none}
-  .prompt{bottom:calc(292px + var(--safe));font-size:11px;padding:7px 11px}
-  .prompt.sub{bottom:calc(330px + var(--safe));font-size:10px}
+  .hotbar{display:none}
+  .statuschips{top:124px;max-width:88vw}
+  .chip{font-size:8px;padding:7px 9px}
+  .prompt{bottom:calc(316px + var(--safe));font-size:11px;padding:7px 11px}
+  .prompt.sub{bottom:calc(354px + var(--safe));font-size:10px}
   .mobile-controls{display:block}
   .reticle{display:none}
+  .mobile-mini{right:16px;bottom:calc(146px + var(--safe));display:grid;grid-template-columns:1fr 1fr;gap:6px;width:132px}
+  .mobile-mini button{padding:8px 4px;font-size:7px}
+  .perk-grid{grid-template-columns:1fr}
+  .trade-row{grid-template-columns:1fr auto}
+  .trade-row button{grid-column:1/-1}
+  .wb-row{grid-template-columns:1fr}
+  .wb-actions{justify-content:flex-start}
   .intro{background:linear-gradient(180deg,rgba(5,9,6,.97) 0%,rgba(6,10,7,.9) 46%,rgba(7,12,8,.6) 100%);align-items:flex-end}
   .intro-content{width:100%;padding:0 22px calc(34px + var(--safe));max-width:none}
   .intro h1{font-size:clamp(58px,16vw,96px)}
@@ -222,7 +305,7 @@ body.hurt .bloodscreen{opacity:1}
   .aerial-label{top:72px;right:16px}
   .aerial-frame{display:none}
   .loading{left:22px;bottom:calc(14px + var(--safe));font-size:7px}
-  .end-stats{max-width:100%}
+  .end-stats{max-width:100%;grid-template-columns:repeat(2,1fr)}
   .modal{padding:20px 18px;max-height:88vh}
   .modal h1{font-size:30px}
   .inv-modal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -277,6 +360,7 @@ body.hurt .bloodscreen{opacity:1}
 
   <section class="hud">
     <div class="hud-head"><span>Survivor</span><b id="statusText">ALIVE</b></div>
+    <div class="levelrow"><span>LVL <b id="levelNum">1</b></span><div class="track xp"><div class="fill xp" id="xpFill"></div></div><span id="xpNum">0/90</span></div>
     <div class="bars">
       <div class="barline"><span>HEALTH</span><div class="track"><div class="fill health" id="healthFill"></div></div><span id="healthNum">100</span></div>
       <div class="barline"><span>STAMINA</span><div class="track"><div class="fill stamina" id="staminaFill"></div></div><span id="staminaNum">100</span></div>
@@ -285,17 +369,24 @@ body.hurt .bloodscreen{opacity:1}
     <div class="perimeter">
       <div>PERIMETER &nbsp;<b id="perimeterState">UNSECURED</b></div>
       <div>DOOR <span id="doorPips"></span> &nbsp; WINDOW <span id="windowPips"></span></div>
+      <div class="mob-hide">ARMOR <b id="armorState">NONE</b> &nbsp; COND <b id="weaponCond">—</b></div>
     </div>
-    <div class="hint">WASD move · mouse aim · LMB strike · E use · F board · wheel zoom</div>
+    <div class="hint">WASD move · mouse aim · LMB strike · E use · F board · C craft · I kit · K skills</div>
   </section>
 
   <section class="kit">
     <div class="inv-head"><span>Field Kit</span><b>[ I ]</b></div>
+    <div class="walletrow"><span>DUKES <b id="dukeNum">0</b></span><span>BOOKS <b id="bookNum">0</b></span></div>
     <div id="capacity"></div>
     <div class="items" id="items"></div>
     <div class="weapon-line"><span>EQUIPPED</span><b id="weaponName">Fists</b></div>
-    <div class="kit-actions"><button id="openCraft">CRAFT [C]</button><button id="openInventory">OPEN KIT</button></div>
+    <div class="cond-line"><span>COND</span><div class="track"><div class="fill cond" id="condFill"></div></div><span id="condNum">—</span></div>
+    <div class="kit-actions"><button id="openCraft">CRAFT [C]</button><button id="openInventory">KIT [I]</button><button id="openSkills">SKILLS [K]</button></div>
   </section>
+
+  <div class="hotbar" id="hotbar"></div>
+  <div class="statuschips"><button class="chip" id="bleedChip">BLEEDING · BANDAGE <b>B</b></button></div>
+  <div class="floaters" id="floaters"></div>
 
   <div class="prompt" id="prompt"><kbd>E</kbd><span id="promptText">INTERACT</span></div>
   <div class="prompt sub" id="prompt2"><kbd>F</kbd><span id="prompt2Text">BOARD UP</span></div>
@@ -304,7 +395,7 @@ body.hurt .bloodscreen{opacity:1}
   <div class="mobile-controls" id="mobile">
     <div class="mobile-hint">LEFT STICK MOVE · DRAG RIGHT SIDE TO AIM</div>
     <div class="joy" id="joy"><b></b></div>
-    <div class="mobile-mini"><button id="mCraft">CRAFT</button><button id="mKit">KIT</button></div>
+    <div class="mobile-mini"><button id="mCraft">CRAFT</button><button id="mKit">KIT</button><button id="mSkills">SKILLS</button><button id="mSwap">SWAP</button></div>
     <div class="mobile-actions">
       <button class="attack" id="mAttack">STRIKE</button>
       <button class="use" id="mUse">USE</button>
@@ -329,41 +420,88 @@ body.hurt .bloodscreen{opacity:1}
       <div class="keyrow"><span>Move</span><b>W A S D</b></div>
       <div class="keyrow"><span>Aim</span><b>MOUSE</b></div>
       <div class="keyrow"><span>Strike / fire</span><b>LEFT CLICK</b></div>
-      <div class="keyrow"><span>Interact · loot · doors</span><b>E</b></div>
+      <div class="keyrow"><span>Interact · loot · trader · bench</span><b>E</b></div>
       <div class="keyrow"><span>Board up · pry boards</span><b>F</b></div>
-      <div class="keyrow"><span>Sprint (uses stamina)</span><b>SHIFT</b></div>
+      <div class="keyrow"><span>Bandage bleeding</span><b>B</b></div>
       <div class="keyrow"><span>Crafting</span><b>C</b></div>
       <div class="keyrow"><span>Field kit</span><b>I</b></div>
-      <div class="keyrow"><span>Camera zoom</span><b>WHEEL</b></div>
+      <div class="keyrow"><span>Skills · books · perks</span><b>K</b></div>
+      <div class="keyrow"><span>Equip weapon slot</span><b>1 – 8</b></div>
+      <div class="keyrow"><span>Swap owned weapon</span><b>Q</b></div>
+      <div class="keyrow"><span>Sprint (uses stamina)</span><b>SHIFT</b></div>
       <div class="keyrow"><span>Survival guide</span><b>TAB</b></div>
     </div>
-    <p style="margin-top:16px;font-size:12px;color:#8d9886">Barricade the safehouse door and window to level 3 before nightfall. Level 3 is secure. Below that, the dead can break through. Repair a vehicle to drive out of the county — or last until dawn.</p>
+    <p style="margin-top:16px;font-size:12px;color:#8d9886">Barricade the safehouse door and window to level 3 before nightfall. Loot containers for materials, magazines and weapons. Read magazines to unlock recipes. Spend XP on perks. The trader camp on the north road is safe ground — buy, sell and take contracts. Repair the pickup to drive out of the county — or last until dawn.</p>
     <button class="close" data-close>RESUME</button>
   </div></div>
 
   <div class="modal-wrap" id="inventoryModal"><div class="modal">
     <div class="modal-kicker">Carry weight &amp; consumables</div>
     <h1>Field Kit</h1>
+    <div class="walletrow"><span>DUKES <b id="kitDukes">0</b></span><span>BOOKS <b id="kitBooks">0</b></span></div>
     <div id="inventoryCapacity"></div>
     <div class="gear-row">
-      <div class="gear-slot">EQUIPPED WEAPON<b id="equippedWeapon">Fists</b></div>
+      <div class="gear-slot">EQUIPPED WEAPON<b id="equippedWeapon">Fists</b><small id="equippedCond">—</small></div>
+      <div class="gear-slot">ARMOR<b id="armorSlot">None</b></div>
       <div class="gear-slot">VEHICLE<b id="vehicleState">Dead pickup</b></div>
     </div>
     <div class="inv-modal-grid" id="inventoryGrid"></div>
+    <div class="tabrow">
+      <button id="openSkillsFromKit">SKILLS &amp; BOOKS [K]</button>
+      <button id="bandageBtn" style="display:none">BANDAGE · 2 CLOTH [B]</button>
+    </div>
     <button class="close" data-close>ESC · CLOSE</button>
+  </div></div>
+
+  <div class="modal-wrap" id="skillsModal"><div class="modal">
+    <div class="modal-kicker">Survivor progression · XP &amp; manuals</div>
+    <h1>Skills</h1>
+    <div class="lvlbar">
+      <div class="lv" id="skillLevel">1</div>
+      <div style="flex:1"><small id="skillXpLabel">0 / 90 XP TO LEVEL 2</small><div class="track xp" style="margin-top:5px"><div class="fill xp" id="skillXpFill"></div></div></div>
+      <div class="pts" id="skillPoints">0 PTS</div>
+    </div>
+    <p style="font-size:12px;color:#98a292;margin-bottom:10px">Earn XP by killing, looting, crafting and reading. Every level grants a skill point. Magazines unlock recipes or grant a free perk level.</p>
+    <div class="perk-grid" id="perkGrid"></div>
+    <h1 style="font-size:24px;margin-top:22px">Books &amp; manuals</h1>
+    <div id="bookList"></div>
+    <div class="emptyhint" id="bookHint">No manuals yet. Search houses, stores, police cars — or buy them from the trader.</div>
+    <button class="close" data-close>ESC · CLOSE</button>
+  </div></div>
+
+  <div class="modal-wrap" id="traderModal"><div class="modal">
+    <div class="modal-kicker">Mercer camp · protected ground</div>
+    <h1>The Trader.</h1>
+    <p id="traderLine" style="font-size:13px">“You made it this far. That buys you a conversation. Dukes spend everywhere.”</p>
+    <div class="wallet"><span>YOUR DUKES</span><b id="traderDukes">0</b></div>
+    <div class="tabrow">
+      <button data-ttab="buy" class="on">BUY</button>
+      <button data-ttab="sell">SELL</button>
+      <button data-ttab="quests">CONTRACTS</button>
+    </div>
+    <div id="traderBody"></div>
+    <button class="close" data-close>ESC · LEAVE CAMP</button>
+  </div></div>
+
+  <div class="modal-wrap" id="workbenchModal"><div class="modal">
+    <div class="modal-kicker">Safehouse · tools &amp; repair</div>
+    <h1>Workbench.</h1>
+    <p style="font-size:13px">Upgrade weapons to level 3, restore condition, and reinforce your clothing. Upgrades raise damage by 18% per level.</p>
+    <div id="workbenchBody"></div>
+    <button class="close" data-close>ESC · STEP AWAY</button>
   </div></div>
 
   <div class="intro" id="intro">
     <div class="intro-content">
       <div class="eyebrow">A top-down survival story · Day 01</div>
       <h1>Last<span>Light</span><em>Dead County · West Mercer</em></h1>
-      <p class="intro-copy">The grid went dark three weeks ago. The roads are full of the dead. From the rooftops, the neighborhood looks quiet — it is not. Find supplies. Board the house. Hold until morning.</p>
+      <p class="intro-copy">The grid went dark three weeks ago. The roads are full of the dead. From the rooftops, the neighborhood looks quiet — it is not. Find supplies. Read what the dead left behind. Board the house. Hold until morning — or find a way out.</p>
       <div class="intro-actions">
         <button class="start" id="start">Enter Dead County &nbsp;→</button>
         <button class="start ghost" id="continue" style="display:none">Continue run</button>
         <button class="start ghost" id="newRun" style="display:none">New run ↻</button>
       </div>
-      <div class="controls-note"><b>WASD</b> move &nbsp;·&nbsp; <b>MOUSE</b> aim &nbsp;·&nbsp; <b>CLICK</b> strike &nbsp;·&nbsp; <b>E</b> use &nbsp;·&nbsp; <b>F</b> board &nbsp;·&nbsp; <b>SHIFT</b> sprint &nbsp;·&nbsp; <b>C</b> craft &nbsp;·&nbsp; <b>WHEEL</b> zoom</div>
+      <div class="controls-note"><b>WASD</b> move &nbsp;·&nbsp; <b>MOUSE</b> aim &nbsp;·&nbsp; <b>CLICK</b> strike &nbsp;·&nbsp; <b>E</b> use &nbsp;·&nbsp; <b>F</b> board &nbsp;·&nbsp; <b>B</b> bandage &nbsp;·&nbsp; <b>C</b> craft &nbsp;·&nbsp; <b>I</b> kit &nbsp;·&nbsp; <b>K</b> skills &nbsp;·&nbsp; <b>Q</b> swap &nbsp;·&nbsp; <b>1–8</b> weapons</div>
       <div class="tag">No one's coming · make your own way</div>
       <a class="src-link" href="./source.html">Source code · Claude pack →</a>
     </div>
@@ -380,6 +518,7 @@ body.hurt .bloodscreen{opacity:1}
       <div class="end-stats">
         <div class="end-stat"><span>Time survived</span><b id="endTime">0h</b></div>
         <div class="end-stat"><span>Dead down</span><b id="endKills">0</b></div>
+        <div class="end-stat"><span>Survivor level</span><b id="endLevel">1</b></div>
         <div class="end-stat"><span>Supplies</span><b id="endLoot">0</b></div>
       </div>
       <button class="start" id="restart">Try again ↻</button>
